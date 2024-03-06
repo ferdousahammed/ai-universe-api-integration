@@ -28,16 +28,107 @@
         AI Universe Hub
       </h1>
       <div class="text-center">
-        <button class="btn text-white bg-rose-500 hover:bg-rose-400">
+        <button
+          onclick="sortByDate()"
+          class="btn text-white bg-rose-500 hover:bg-rose-400"
+        >
           Sort By Date
         </button>
       </div>
     </header>
-    <main>
+    <main class="space-y-5">
+      <div
+        id="loading-gif"
+        class="justify-center hidden lg:py-10 py-6 w-full h-screen -translate-y-24"
+      >
+        <span class="loading loading-spinner text-error loading-lg"></span>
+      </div>
       <section
         id="ai-card-container"
         class="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6"
       ></section>
+      <section>
+        <dialog id="my_modal" class="modal lg:w-2/3 mx-auto">
+          <div class="relative bg-white rounded-xl p-5 m-3">
+            <form method="dialog" class="relative">
+              <button
+                class="absolute -top-7 -right-7 bg-red-400 text-white rounded-full h-7 w-7"
+              >
+                ✕
+              </button>
+            </form>
+            <div class="flex flex-col-reverse lg:flex-row gap-4">
+              <div
+                class="lg:p-7 p-4 border-2 border-rose-500 bg-opacity-5 bg-rose-500 rounded-lg space-y-4 flex-1"
+              >
+                <h4
+                  id="modal-title"
+                  class="lg:text-2xl text-xl font-semibold"
+                ></h4>
+                <div
+                  id="plan-price-container"
+                  class="flex gap-3 flex-wrap justify-center"
+                ></div>
+                <div class="flex justify-between flex-col lg:flex-row gap-4">
+                  <div class="space-y-3">
+                    <h3 class="text-2xl font-semibold">Features</h3>
+                    <ul
+                      id="features-container"
+                      class="text-zinc-600 list-disc pl-4"
+                    ></ul>
+                  </div>
+                  <div class="space-y-3">
+                    <h3 id="integrations" class="text-2xl font-semibold">
+                      Integrations
+                    </h3>
+                    <ul
+                      id="integrations-container"
+                      class="text-zinc-600 list-disc pl-4"
+                    ></ul>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="lg:p-7 p-4 border-2 border-gray-200 rounded-lg space-y-4 flex-1"
+              >
+                <div class="relative">
+                  <div>
+                    <div id="banner-img" class="carousel w-full"></div>
+                    <div
+                      id="carousel-buttons"
+                      class="flex justify-center w-full py-2 gap-2"
+                    ></div>
+                  </div>
+                  <p
+                    id="accuracy"
+                    class="bg-rose-500 px-4 py-1 rounded-lg absolute top-3 right-3 text-white font-semibold"
+                  >
+                    94% accuracy
+                  </p>
+                </div>
+
+                <h3 class="text-center font-semibold text-2xl">
+                  Hi, how are you doing today?
+                </h3>
+                <p class="text-base text-center text-zinc-600">
+                  I'm doing well, thank you for asking. How can I assist you
+                  today?
+                </p>
+              </div>
+            </div>
+          </div>
+        </dialog>
+      </section>
+      <section>
+        <div class="text-center">
+          <button
+            onclick="showAll()"
+            class="btn text-white bg-rose-500 hover:bg-rose-400"
+          >
+            Show All
+          </button>
+        </div>
+      </section>
     </main>
     <script src="./js/app.js"></script>
   </body>

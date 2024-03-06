@@ -2,8 +2,9 @@ console.log("AI Universe");
 
 const allData = "https://openapi.programming-hero.com/api/ai/tools/";
 const singleData = "https://openapi.programming-hero.com/api/ai/tool/";
-
+const modalElement = document.getElementById("my_modal");
 const aiCardContainer = document.getElementById("ai-card-container");
+let isSort = false;
 const fetchData = async (url) => {
   const response = await fetch(url);
   const data = await response.json();
@@ -11,10 +12,28 @@ const fetchData = async (url) => {
   return obj;
 };
 
-const displayAllData = async () => {
+const toggleSpinner = (isLoading, id) => {
+  const loadingGif = document.getElementById(id);
+  isLoading
+    ? loadingGif.classList.replace("hidden", "flex")
+    : loadingGif.classList.replace("flex", "hidden");
+};
+
+const displayAllData = async (isSort) => {
+  aiCardContainer.innerHTML = "";
   const url = allData;
+  toggleSpinner(true, "loading-gif");
   const data = await fetchData(url);
-  data.tools.forEach((tool) => {
+  const x = data.tools;
+  if (isSort) {
+    x.sort((prev, current) => {
+      a = dateStrToNum(prev.published_in);
+      b = dateStrToNum(current.published_in);
+      return b - a;
+    });
+  }
+
+  x.forEach((tool) => {
     const div = document.createElement("div");
     div.className =
       "card w-full bg-base-100 p-4 shadow-none border-2 border-gray-100 space-y-4";
@@ -85,12 +104,127 @@ const displayAllData = async () => {
       `;
     aiCardContainer.appendChild(div);
   });
+  toggleSpinner(false, "loading-gif");
 };
 
 const displayAiData = async (id) => {
   const url = singleData + id;
-  console.log(url);
   const data = await fetchData(url);
+  console.log(url);
+  setInnerHtmlByID("modal-title", data.description);
+  const featuresContainer = document.getElementById("features-container");
+  featuresContainer.innerHTML = "";
+  const integrationsContainer = document.getElementById(
+    "integrations-container"
+  );
+  integrationsContainer.innerHTML = "";
+  const planPriceContainer = document.getElementById("plan-price-container");
+  planPriceContainer.innerHTML = "";
+  const integrationText = document.getElementById("integrations");
+  for (const feature in data.features) {
+    const fListEle = document.createElement("li");
+    fListEle.setAttribute("title", data.features[feature].description);
+    fListEle.innerText = data.features[feature].feature_name;
+    featuresContainer.appendChild(fListEle);
+  }
+
+  if (data.integrations) {
+    integrationText.classList.remove("hidden");
+    data.integrations.forEach((integration) => {
+      const iListEle = document.createElement("li");
+      iListEle.innerText = integration;
+      integrationsContainer.appendChild(iListEle);
+    });
+  } else {
+    integrationText.classList.add("hidden");
+  }
+
+  let count = 0;
+  let color;
+  if (data.pricing) {
+    planPriceContainer.classList.remove("hidden");
+
+    data.pricing.forEach((planPrice) => {
+      const div = document.createElement("div");
+      div.className = `bg-white rounded-2xl text-base font-bold text-center lg:p-5 p-3`;
+      const price = planPrice.price.split("/")[0];
+      const plan = planPrice.plan;
+      if (count < 2) {
+        switch (count) {
+          case 0:
+            color = "text-green-700";
+            break;
+          case 1:
+            color = "text-orange-400";
+            break;
+        }
+        div.innerHTML = `<p class="${color}">${price}/<br />month<br />${plan}</p>`;
+      } else {
+        color = "text-rose-500";
+        div.innerHTML = `<p class="text-rose-500">Contact<br />us<br />${plan}</p>`;
+      }
+      count++;
+      planPriceContainer.appendChild(div);
+    });
+  } else {
+    planPriceContainer.classList.add("hidden");
+  }
+
+  setInnerHtmlByID("accuracy", `${data.accuracy.score * 100}% accuracy`);
+  showModalAiBanner(data.image_link);
+
+  modalElement.showModal();
 };
 
-displayAllData();
+displayAllData(isSort);
+
+const setInnerHtmlByID = (id, html) =>
+  (document.getElementById(id).innerHTML = html);
+
+const showModalAiBanner = (images) => {
+  const bannerImg = document.getElementById("banner-img");
+  bannerImg.innerHTML = "";
+  const imgContainer = document.createElement("div");
+  imgContainer.className = "carousel w-full";
+  const carouselBtn = document.getElementById("carousel-buttons");
+  carouselBtn.innerHTML = "";
+
+  let count = 0;
+  images.forEach((img) => {
+    const div = document.createElement("div");
+    div.className = "carousel-item w-full";
+    div.id = `item${count}`;
+    div.innerHTML = `
+        <img class="rounded-2xl" src="${img}" class="w-full" />
+    `;
+    const anchorEle = document.createElement("a");
+    anchorEle.href = `#item${count}`;
+    anchorEle.className = "btn btn-xs";
+    anchorEle.innerText = `${count + 1}`;
+
+    carouselBtn.appendChild(anchorEle);
+
+    imgContainer.appendChild(div);
+    count++;
+  });
+  bannerImg.appendChild(imgContainer);
+};
+
+const dateStrToNum = (date) => {
+  let x = date.split("/").reverse();
+  [y, m, d] = x;
+  if (m.length < 2) {
+    m = `0${m}`;
+  }
+  if (d.length < 2) {
+    d = `0${d}`;
+  }
+
+  reverseDate = parseInt([y, m, d].join(""));
+  return reverseDate;
+};
+
+const sortByDate = () => {
+  isSort = true;
+  displayAllData(isSort);
+};

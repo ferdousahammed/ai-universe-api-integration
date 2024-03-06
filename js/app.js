@@ -5,6 +5,7 @@ const singleData = "https://openapi.programming-hero.com/api/ai/tool/";
 const modalElement = document.getElementById("my_modal");
 const aiCardContainer = document.getElementById("ai-card-container");
 let isSort = false;
+let isShowAll = false;
 const fetchData = async (url) => {
   const response = await fetch(url);
   const data = await response.json();
@@ -24,13 +25,19 @@ const displayAllData = async (isSort) => {
   const url = allData;
   toggleSpinner(true, "loading-gif");
   const data = await fetchData(url);
-  const x = data.tools;
+  let x = data.tools;
   if (isSort) {
     x.sort((prev, current) => {
       a = dateStrToNum(prev.published_in);
       b = dateStrToNum(current.published_in);
       return b - a;
     });
+  }
+
+  if (isShowAll) {
+    x = x;
+  } else {
+    x = x.slice(0, 6);
   }
 
   x.forEach((tool) => {
@@ -226,5 +233,12 @@ const dateStrToNum = (date) => {
 
 const sortByDate = () => {
   isSort = true;
+  displayAllData(isSort);
+};
+
+const showAll = () => {
+  const showAllBtn = document.getElementById("show-all-btn");
+  showAllBtn.classList.add("hidden");
+  isShowAll = true;
   displayAllData(isSort);
 };

@@ -4,6 +4,7 @@ const allData = "https://openapi.programming-hero.com/api/ai/tools/";
 const singleData = "https://openapi.programming-hero.com/api/ai/tool/";
 const modalElement = document.getElementById("my_modal");
 const aiCardContainer = document.getElementById("ai-card-container");
+const sampleQuestions = document.getElementById("sample-questions");
 let isSort = false;
 let isShowAll = false;
 const fetchData = async (url) => {
@@ -146,18 +147,17 @@ const displayAiData = async (id) => {
     integrationText.classList.add("hidden");
   }
 
-  let count = 0;
   let color;
   if (data.pricing) {
     planPriceContainer.classList.remove("hidden");
 
-    data.pricing.forEach((planPrice) => {
+    data.pricing.forEach((planPrice, index) => {
       const div = document.createElement("div");
       div.className = `bg-white rounded-2xl text-base font-bold text-center lg:p-5 p-3`;
       const price = planPrice.price.split("/")[0];
       const plan = planPrice.plan;
-      if (count < 2) {
-        switch (count) {
+      if (index < 2) {
+        switch (index) {
           case 0:
             color = "text-green-700";
             break;
@@ -170,7 +170,6 @@ const displayAiData = async (id) => {
         color = "text-rose-500";
         div.innerHTML = `<p class="text-rose-500">Contact<br />us<br />${plan}</p>`;
       }
-      count++;
       planPriceContainer.appendChild(div);
     });
   } else {
@@ -179,6 +178,7 @@ const displayAiData = async (id) => {
 
   setInnerHtmlByID("accuracy", `${data.accuracy.score * 100}% accuracy`);
   showModalAiBanner(data.image_link);
+  displaySampleQuestionsAns(data.input_output_examples);
 
   modalElement.showModal();
 };
@@ -196,23 +196,21 @@ const showModalAiBanner = (images) => {
   const carouselBtn = document.getElementById("carousel-buttons");
   carouselBtn.innerHTML = "";
 
-  let count = 0;
-  images.forEach((img) => {
+  images.forEach((img, index) => {
     const div = document.createElement("div");
     div.className = "carousel-item w-full";
-    div.id = `item${count}`;
+    div.id = `item${index}`;
     div.innerHTML = `
         <img class="rounded-2xl" src="${img}" class="w-full" />
     `;
     const anchorEle = document.createElement("a");
-    anchorEle.href = `#item${count}`;
+    anchorEle.href = `#item${index}`;
     anchorEle.className = "btn btn-xs";
-    anchorEle.innerText = `${count + 1}`;
+    anchorEle.innerText = `${index + 1}`;
 
     carouselBtn.appendChild(anchorEle);
 
     imgContainer.appendChild(div);
-    count++;
   });
   bannerImg.appendChild(imgContainer);
 };
@@ -241,4 +239,19 @@ const showAll = () => {
   showAllBtn.classList.add("hidden");
   isShowAll = true;
   displayAllData(isSort);
+};
+
+const displaySampleQuestionsAns = (questionsAns) => {
+  questionsAns.forEach((questionAns, index) => {
+    setTimeout(() => {
+      sampleQuestions.innerHTML = `
+                  <h3 class="text-center font-semibold text-2xl">
+                    ${questionAns.input}
+                  </h3>
+                  <p class="text-base text-center text-zinc-600">
+                    ${questionAns.output}
+                  </p>
+  `;
+    }, index * 5000);
+  });
 };
